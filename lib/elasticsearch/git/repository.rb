@@ -15,38 +15,6 @@ module Elasticsearch
         include Elasticsearch::Git::Model
         include Elasticsearch::Git::EncoderHelper
 
-        mapping _timestamp: { enabled: true } do
-          indexes :blob do
-            indexes :id,          type: :string, index_options: 'offsets', search_analyzer: :human_analyzer,  index_analyzer: :human_analyzer
-            indexes :rid,         type: :string, index: :not_analyzed
-            indexes :oid,         type: :string, index_options: 'offsets', search_analyzer: :code_analyzer,   index_analyzer: :code_analyzer
-            indexes :commit_sha,  type: :string, index_options: 'offsets', search_analyzer: :code_analyzer,   index_analyzer: :code_analyzer
-            indexes :path,        type: :string, search_analyzer: :path_analyzer,   index_analyzer: :path_analyzer
-            indexes :content,     type: :string, index_options: 'offsets', search_analyzer: :code_analyzer,   index_analyzer: :code_analyzer
-            indexes :language,    type: :string, index: :not_analyzed
-          end
-
-          indexes :commit do
-            indexes :id,          type: :string, index_options: 'offsets', search_analyzer: :human_analyzer,  index_analyzer: :human_analyzer
-            indexes :rid,         type: :string, index: :not_analyzed
-            indexes :sha,         type: :string, index_options: 'offsets', search_analyzer: :code_analyzer,    index_analyzer: :code_analyzer
-
-            indexes :author do
-              indexes :name,      type: :string, index_options: 'offsets', search_analyzer: :code_analyzer,    index_analyzer: :code_analyzer
-              indexes :email,     type: :string, index_options: 'offsets', search_analyzer: :code_analyzer,    index_analyzer: :code_analyzer
-              indexes :time,      type: :date
-            end
-
-            indexes :commiter do
-              indexes :name,      type: :string, index_options: 'offsets', search_analyzer: :code_analyzer,    index_analyzer: :code_analyzer
-              indexes :email,     type: :string, index_options: 'offsets', search_analyzer: :code_analyzer,    index_analyzer: :code_analyzer
-              indexes :time,      type: :date
-            end
-
-            indexes :message,     type: :string, index_options: 'offsets', search_analyzer: :code_analyzer,    index_analyzer: :code_analyzer
-          end
-        end
-
         # Indexing all text-like blobs in repository
         #
         # All data stored in global index
