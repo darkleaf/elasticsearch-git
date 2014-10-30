@@ -90,6 +90,7 @@ module Elasticsearch
 
         def perform_bulk(bulk_operations)
           client_for_indexing.bulk body: bulk_operations.compact
+          logger.info "bulk performed for repository #{repository_id}"
         rescue => ex
           logger.warn "Error with bulk repository indexing #{repository_id}. Reason: #{ex.message}"
         end
