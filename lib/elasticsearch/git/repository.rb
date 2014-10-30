@@ -66,21 +66,66 @@ module Elasticsearch
 
           diff = repository_for_indexing.diff(from, to)
 
-          diff.deltas.reverse.each_with_index do |delta, step|
-            if delta.status == :deleted
-              next if delta.old_file[:mode].to_s(8) == "160000"
-              b = LiteBlob.new(repository_for_indexing, delta.old_file)
-              delete_from_index_blob(b)
-            else
-              next if delta.new_file[:mode].to_s(8) == "160000"
-              b = LiteBlob.new(repository_for_indexing, delta.new_file)
-              index_blob(b, to)
+          diff.deltas.reverse.each_slice(100) do |slice|
+            bulk_operations = slice.map do |delta|
+              if delta.status == :deleted
+                next if delta.old_file[:mode].to_s(8) == "160000"
+                b = LiteBlob.new(repository_for_indexing, delta.old_file)
+                bulk_operation_delete_blob(b)
+                #delete_from_index_blob(b)
+              else
+                next if delta.new_file[:mode].to_s(8) == "160000"
+                b = LiteBlob.new(repository_for_indexing, delta.new_file)
+                bulk_operation_index_blob(b, to)
+                #index_blob(b, to)
+              end
             end
 
+            perform_bulk bulk_operations
+
             # Run GC every 100 blobs
-            ObjectSpace.garbage_collect if step % 100 == 0
+            ObjectSpace.garbage_collect
           end
         end
+
+        def perform_bulk(bulk_operations)
+          client_for_indexing.bulk body: bulk_operations.compact
+        rescue => ex
+          logger.warn "Error with bulk repository indexing #{repository_id}. Reason: #{ex.message}"
+        end
+
+
+        def bulk_operation_delete_blob(blob)
+          return unless blob.text?
+          { delete: { _index: "#{self.class.index_name}", _type: "repository", _id: "#{repository_id}_#{blob.path}" } }
+        end
+
+
+        def bulk_operation_index_blob(blob, target_sha)
+          return unless can_index_blob?(blob)
+          {
+            index:  {
+              _index: "#{self.class.index_name}", _type: "repository", _id: "#{repository_id}_#{blob.path}",
+              data: {
+                blob: {
+                  type: "blob",
+                  oid: blob.id,
+                  rid: repository_id,
+                  content: blob.data,
+                  commit_sha: target_sha,
+                  path: blob.path,
+                  language: blob.language ? blob.language.name : "Text"
+                }
+              }
+            }
+          }
+        end
+
+
+
+
+
+
 
         def index_blob(blob, target_sha)
           if can_index_blob?(blob)
