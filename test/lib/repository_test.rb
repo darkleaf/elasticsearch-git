@@ -10,15 +10,20 @@ class RepositoryTest < TestCase
 
   def test_index_commits
     commit_count = @repository.index_commits
-    assert { commit_count == RepoInfo::COMMIT_COUNT }
+    Repository.__elasticsearch__.refresh_index!
+
+    result = @repository.search('', type: :commit)
+    assert { result[:commits][:total_count] == RepoInfo::COMMIT_COUNT }
   end
 
   def test_index_commits_after_first_push
     commit_count = @repository.index_commits(
         from_rev: "0000000000000000000000000000000000000000",
         to_rev: @repository.repository_for_indexing.head.target.oid)
+    Repository.__elasticsearch__.refresh_index!
 
-    assert { commit_count == RepoInfo::COMMIT_COUNT }
+    result = @repository.search('', type: :commit)
+    assert { result[:commits][:total_count] == RepoInfo::COMMIT_COUNT }
   end
 
   #TODO write better assertions

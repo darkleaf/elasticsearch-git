@@ -61,6 +61,14 @@ Repository.search("query", type: 'commit')
 Repository.search("query")
 ```
 
+## Configuration
+
+``` ruby
+# in initializer
+
+Elasticsearch::Git.base_index_name = 'some_index_name'
+# Elasticsearch::Git.index_name #=> "some_index_name_#{Rails.env}"
+
 ## Integration with Gitlab
 
 [Sample (In Undev Gitlab fork)](https://github.com/zzet/gitlabhq/blob/master/app/elastic/repositories_search.rb)
