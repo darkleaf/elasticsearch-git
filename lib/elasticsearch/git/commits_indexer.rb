@@ -43,8 +43,16 @@ module Elasticsearch
                 type: "commit",
                 rid: repository_id,
                 sha: commit.oid,
-                author: commit.author,
-                committer: commit.committer,
+                author: {
+                  name: commit.author[:name],
+                  email: commit.author[:email],
+                  time: commit.author[:time].strftime('%Y%m%dT%H%M%S%z'),
+                },
+                committer: {
+                  name: commit.committer[:name],
+                  email: commit.committer[:email],
+                  time: commit.committer[:time].strftime('%Y%m%dT%H%M%S%z'),
+                },
                 message: encode!(commit.message)
               }
             }
