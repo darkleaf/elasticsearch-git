@@ -28,7 +28,7 @@ module Elasticsearch
         ops = bulk_operations.compact
         return if ops.empty?
         responce = client.bulk body: ops
-        logger.info "Bulk operations are performed for repository #{repository_id}. Responce: #{responce}"
+        logger.info "Bulk operations are performed for repository #{repository_id}."
       rescue => ex
         logger.warn "Error with bulk repository indexing. Reason: #{ex.message}"
       end
