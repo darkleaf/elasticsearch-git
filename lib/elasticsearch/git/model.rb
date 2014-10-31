@@ -21,17 +21,17 @@ module Elasticsearch
               human_analyzer: {
                 type: 'custom',
                 tokenizer: 'human_tokenizer',
-                filter: %w(lowercase asciifolding human_ngrams)
+                filter: %w(lowercase asciifolding)
               },
               path_analyzer: {
                 type: 'custom',
                 tokenizer: 'path_tokenizer',
-                filter: %w(lowercase asciifolding path_ngrams)
+                filter: %w(lowercase asciifolding)
               },
               sha_analyzer: {
                 type: 'custom',
                 tokenizer: 'sha_tokenizer',
-                filter: %w(lowercase asciifolding sha_ngrams)
+                filter: %w(lowercase asciifolding)
               },
               code_analyzer: {
                 type: 'custom',
@@ -58,21 +58,6 @@ module Elasticsearch
               },
             },
             filter: {
-              human_ngrams: {
-                type: "NGram",
-                min_gram: 1,
-                max_gram: 20
-              },
-              sha_ngrams: {
-                type: "edgeNGram",
-                min_gram: 8,
-                max_gram: 40
-              },
-              path_ngrams: {
-                type: "edgeNGram",
-                min_gram: 3,
-                max_gram: 15
-              },
               code_stemmer: {
                 type: "stemmer",
                 name: "minimal_english"
