@@ -61,7 +61,7 @@ module Elasticsearch
         #
         # For search from blobs use type 'blob'
         def index_blobs(from_rev: nil, to_rev: repository_for_indexing.last_commit.oid)
-          BlobsIndexer.index_blobs(__elasticsearch__.client, repository_id, repository_for_indexing, logger, from_rev: from_rev, to_rev: to_rev)
+          BlobsIndexer.index_blobs(__elasticsearch__.client, self.class.index_name, repository_id, repository_for_indexing, logger, from_rev: from_rev, to_rev: to_rev)
         end
 
         # Indexing all commits in repository
@@ -87,7 +87,7 @@ module Elasticsearch
         #
         # For search from commits use type 'commit'
         def index_commits(from_rev: nil, to_rev: repository_for_indexing.last_commit.oid)
-          CommitsIndexer.index_commits(__elasticsearch__.client, repository_id, repository_for_indexing, logger, from_rev: from_rev, to_rev: to_rev)
+          CommitsIndexer.index_commits(__elasticsearch__.client, self.class.index_name, repository_id, repository_for_indexing, logger, from_rev: from_rev, to_rev: to_rev)
         end
 
         def search(query, type: :all, page: 1, per: 20, options: {})
