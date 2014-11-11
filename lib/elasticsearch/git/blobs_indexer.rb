@@ -22,6 +22,8 @@ module Elasticsearch
           end
 
           perform_bulk client, bulk_operations, repository_id, logger
+
+          ObjectSpace.garbage_collect
         end
       end
 
@@ -60,9 +62,9 @@ module Elasticsearch
         }
       end
 
-      # Index text-like files which size less 1.mb
+      # Index text-like files which size less 100.kb
       def can_index_blob?(blob)
-        blob.text? && (blob.size && blob.size.to_i < 1048576)
+        (blob.size && blob.size.to_i < 100_000) && blob.text?
       end
     end
   end

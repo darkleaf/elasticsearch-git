@@ -7,7 +7,7 @@ require "elasticsearch/git/utils"
 
 module Elasticsearch
   module Git
-    BATCH_SIZE = 300
+    BATCH_SIZE = 50
   end
 end
 

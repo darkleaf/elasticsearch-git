@@ -9,7 +9,6 @@ module Elasticsearch
         from, to = Utils.parse_revs(repository_for_indexing, from_rev, to_rev)
         range = [from, to].compact.join('..')
         out, err, status = Open3.capture3("git log #{range} --format=\"%H\"", chdir: repository_for_indexing.path)
-
         if status.success? && err.blank?
           #TODO use rugged walker!!!
           commit_oids = out.split("\n")
@@ -19,6 +18,8 @@ module Elasticsearch
               index_commit_operation(repository_for_indexing.lookup(commit), repository_id, index_name)
             end
             perform_bulk client, bulk_operations, repository_id, logger
+
+            ObjectSpace.garbage_collect
           end
         end
       end
